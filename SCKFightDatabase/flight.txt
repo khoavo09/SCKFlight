@@ -1,6 +1,14 @@
-1	Asiana Airlines	Boeing 777	SJC	MCO	53
-2	Southwest	Boeing 717	MCO	SFO	167
+insert into flight values (100,"Asiana Airlines","Boeing 777-200","SJC","MCO",120);
+insert into flight values (101,"JetBlue Airways","Airbus A340-300","JFK","MCO",360);
+insert into flight values (102,"Air Canada","Boeing 777-200","SJC","MCO",222);
+insert into flight values (103,"JetBlue Airways","Boeing 777-200","SJC","LAX",430);
+insert into flight values (104,"Asiana Airlines","Airbus A340-900","PHX","MIA",290);
+insert into flight values (105,"Delta Airlines","Airbus A340-300","LAS","MCO",200);
+insert into flight values (106,"United Airlines","Boeing 747-400","SFO","MCO",150
 
-
-
-insert into flight values (1,Asiana Airlines,Boeing,777.SJC,MCO,53)
+insert into flight values (107,"JetBlue Airways","Airbus A340-900","SFO","MIA",68);
+insert into flight values (108,"American Airlines","Boeing 747-400","LAS","LAX",150);
+insert into flight values (109,"Delta Airlines","Boeing 747-400","PHX","SFO",189);
+insert into flight values (110,"JetBlue Airways","Boeing 777-300","SFO","JFK",257);
+insert into flight values (111,"American Airlines","Boeing 747-400","MIA","JFK",98);
+insert into flight values (112,"United Airlines","Airbus A340-500","LAS","DTW",27);

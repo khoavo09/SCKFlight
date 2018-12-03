@@ -1,7 +1,3 @@
-SJC	San Jose International Airport	San Jose	California
-MCO	Orlando International Airport	Orlando	Florida
-SFO	San Francisco International Airport	San Francisco	California
-
 insert into airport values("SJC","San Jose International Airport","San Jose","California");
 insert into airport values("MCO","Orlando International Airport","Orlando","Florida");
 insert into airport values("SFO","San Francisco International Airport","San Francisco","California");
@@ -10,6 +6,6 @@ insert into airport values("SFO","San Francisco International Airport","San Fran
 insert into airport values("ORD","O'Hare International Airport","Chicago","Illinois");
 insert into airport values("JFK","John F. Kennedy International Airport","New York","NY");
 insert into airport values("PHX","Phoenix Sky Harbor International Airport","Phoenix","Arizona");
-insert into airport values("MIA","Miami International Airport","Miami,"Florida");
+insert into airport values("MIA","Miami International Airport","Miami","Florida");
 insert into airport values("DTW","Detroit Metropolitan Airport","Detroit","Michigan");
 insert into airport values("LAS","McCarran International Airport","Las Vegas","Nevada");

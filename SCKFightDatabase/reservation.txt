@@ -1,2 +1,16 @@
-1	1	Eco	Non-Stop	1541135424	1541135425	942
-2	2	Eco	Non-Stop	1541140153	1541140154	503
+insert into reservation values(20,100,"Eco","Non-Stop",1541135424,1541135425,320);
+insert into reservation values(20,101,"First Class","Non-Stop",1541135424,1541135425,932);
+insert into reservation values(21,102,"Eco","Non-Stop",1541135422,1541135425,295);
+insert into reservation values(22,102,"Eco","Non-Stop",1541135419,1541135426,230);
+insert into reservation values(23,103,"First Class","Non-Stop",1541135420,1541135428,890);
+insert into reservation values(24,104,"Eco","Non-Stop",1541135423,1541135425,275);
+insert into reservation values(25,106,"Eco","Non-Stop",1541135422,1541135440,283);
+insert into reservation values(26,108,"Eco","Non-Stop",1541135422,1541135440,370);
+insert into reservation values(27,108,"Eco","Non-Stop",1541135422,1541135440,255);
+insert into reservation values(28,111,"Eco","Non-Stop",1541135422,1541135440,284);
+insert into reservation values(29,105,"First Class","Non-Stop",1541135422,1541135440,885);
+insert into reservation values(30,107,"First Class","Non-Stop",1541135422,1541135440,939);
+insert into reservation values(31,111,"First Class","Non-Stop",1541135422,1541135440,923);
+insert into reservation values(32,103,"First Class","Non-Stop",1541135422,1541135440,911);
+insert into reservation values(33,102,"First Class","Non-Stop",1541135422,1541135440,956);
+insert into reservation values(34,112,"First Class","Non-Stop",1541135422,1541135440,924);

@@ -1,2 +1,14 @@
-1	1	100	430	On Time
-2	2	600	900	On Time
+insert into schedule values (1,100,200,430,"On Time");
+insert into schedule values (1,101,1200,2330,"On Time");
+insert into schedule values (1,102,210,730,"On Time");
+insert into schedule values (1,103,350,1530,"On Time");
+insert into schedule values (1,104,220,430,"On Time");
+insert into schedule values (1,105,100,620,"On Time");
+insert into schedule values (1,106,800,1530,"On Time");
+insert into schedule values (1,107,920,1930,"On Time");
+insert into schedule values (1,108,320,2220,"On Time");
+insert into schedule values (1,109,240,1030,"On Time");
+insert into schedule values (1,110,120,2310,"On Time");
+insert into schedule values (1,111,320,1230,"On Time");
+insert into schedule values (1,112,200,1430,"On Time");
+
