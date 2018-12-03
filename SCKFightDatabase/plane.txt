@@ -1,0 +1,9 @@
+Boeing 777	500
+Boeing 717	400
+
+insert into plane values("Boeing 777-300","550");
+insert into plane values("Boeing 777-200","440");
+insert into plane values("Airbus A340-300","295");
+insert into plane values("Airbus A340-500,"400");
+insert into plane values("Airbus A340-900","500");
+insert into plane values("Boeing 747-400","500");

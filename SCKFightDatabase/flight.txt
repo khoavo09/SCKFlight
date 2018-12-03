@@ -1,0 +1,6 @@
+1	Asiana Airlines	Boeing 777	SJC	MCO	53
+2	Southwest	Boeing 717	MCO	SFO	167
+
+
+
+insert into flight values (1,Asiana Airlines,Boeing,777.SJC,MCO,53)

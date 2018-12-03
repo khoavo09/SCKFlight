@@ -1,0 +1,89 @@
+DROP DATABASE IF EXISTS SCKFlightDatabase;
+CREATE DATABASE SCKFlightDatabase;
+USE SCKFlightDatabase;
+
+DROP TABLE IF EXISTS PLANE;
+CREATE TABLE PLANE
+(
+ model VARCHAR(15),
+ seatCapacity INT CHECK(seatCapacity > 0),
+ PRIMARY KEY (model)
+);
+
+DROP TABLE IF EXISTS AIRPORT;
+CREATE TABLE AIRPORT
+(
+ code VARCHAR(3),
+ airportName VARCHAR(50),
+ city VARCHAR(20),
+ state VARCHAR(20),
+ PRIMARY KEY (code)
+);
+
+DROP TABLE IF EXISTS FLIGHT;
+CREATE TABLE FLIGHT
+(
+ flightID INT AUTO_INCREMENT,
+ airlineName VARCHAR(30),
+ model VARCHAR(15),
+ departAirport VARCHAR(3),
+ arriveAirport VARCHAR(3),
+ availableSeats INT CHECK(availableSeats < PLANE(seatCapacity)),
+ PRIMARY KEY (flightID),
+ FOREIGN KEY (model) REFERENCES PLANE(model),
+ FOREIGN KEY (departAirport) REFERENCES AIRPORT(code),
+ FOREIGN KEY (arriveAirport) REFERENCES AIRPORT(code)
+);
+ALTER TABLE FLIGHT AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS SCHEDULE;
+CREATE TABLE SCHEDULE
+(
+ scheduleID INT,
+ flightID INT,
+ departTime INT CHECK(departTime > 0 AND departTime < 2359),
+ arrivalTime INT CHECK(arrivalTime > 0 AND arrivalTime < 2359),
+ status VARCHAR(10),
+ PRIMARY KEY (scheduleID),
+ FOREIGN KEY (flightID) REFERENCES FLIGHT(flightID)
+);
+ALTER TABLE SCHEDULE AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS RESERVATION;
+CREATE TABLE RESERVATION
+(
+ reservationID INT AUTO_INCREMENT,
+ flightID INT,
+ class VARCHAR(15),
+ type VARCHAR(15),
+ timestamp INT,
+ PRIMARY KEY (reservationID, flightID),
+ FOREIGN KEY (flightID) REFERENCES Flight(flightID)
+);
+ALTER TABLE RESERVATION AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS CUSTOMER;
+CREATE TABLE CUSTOMER
+(
+ cID INT AUTO_INCREMENT UNIQUE,
+ name VARCHAR(30),
+ reservationID INT,
+ email VARCHAR(50),
+ PRIMARY KEY (cID),
+ FOREIGN KEY (reservationID) REFERENCES Reservation(reservationID)
+ );
+ALTER TABLE CUSTOMER AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS USER;
+CREATE TABLE USER
+(
+email VARCHAR(30),
+password VARCHAR(20) NOT NULL,
+userType varchar(5)
+);
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\chris\\Desktop\\SCKFightDatabase\\plane.txt' INTO TABLE PLANE;
+LOAD DATA LOCAL INFILE 'C:\\Users\\chris\\Desktop\\SCKFightDatabase\\airport.txt' INTO TABLE AIRPORT;
+LOAD DATA LOCAL INFILE 'C:\\Users\\chris\\Desktop\\SCKFightDatabase\\flight.txt' INTO TABLE FLIGHT;
+LOAD DATA LOCAL INFILE 'C:\\Users\\chris\\Desktop\\SCKFightDatabase\\schedule.txt' INTO TABLE SCHEDULE;
+LOAD DATA LOCAL INFILE 'C:\\Users\\chris\\Desktop\\SCKFightDatabase\\reservation.txt' INTO TABLE RESERVATION;
