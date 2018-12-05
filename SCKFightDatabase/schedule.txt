@@ -1,14 +1,14 @@
 insert into schedule values (1,100,200,430,"On Time");
-insert into schedule values (1,101,1200,2330,"On Time");
-insert into schedule values (1,102,210,730,"On Time");
-insert into schedule values (1,103,350,1530,"On Time");
-insert into schedule values (1,104,220,430,"On Time");
-insert into schedule values (1,105,100,620,"On Time");
-insert into schedule values (1,106,800,1530,"On Time");
-insert into schedule values (1,107,920,1930,"On Time");
-insert into schedule values (1,108,320,2220,"On Time");
-insert into schedule values (1,109,240,1030,"On Time");
-insert into schedule values (1,110,120,2310,"On Time");
-insert into schedule values (1,111,320,1230,"On Time");
-insert into schedule values (1,112,200,1430,"On Time");
+insert into schedule values (2,101,1200,2330,"On Time");
+insert into schedule values (3,102,210,730,"On Time");
+insert into schedule values (4,103,350,1530,"On Time");
+insert into schedule values (5,104,220,430,"On Time");
+insert into schedule values (6,105,100,620,"On Time");
+insert into schedule values (7,106,800,1530,"On Time");
+insert into schedule values (8,107,920,1930,"On Time");
+insert into schedule values (9,108,320,2220,"On Time");
+insert into schedule values (10,109,240,1030,"On Time");
+insert into schedule values (11,110,120,2310,"On Time");
+insert into schedule values (12,111,320,1230,"On Time");
+insert into schedule values (13,112,200,1430,"On Time");
 

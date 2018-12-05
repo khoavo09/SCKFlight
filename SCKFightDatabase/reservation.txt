@@ -14,3 +14,6 @@ insert into reservation values(31,111,"First Class","Non-Stop",1541135422,154113
 insert into reservation values(32,103,"First Class","Non-Stop",1541135422,1541135440,911);
 insert into reservation values(33,102,"First Class","Non-Stop",1541135422,1541135440,956);
 insert into reservation values(34,112,"First Class","Non-Stop",1541135422,1541135440,924);
+insert into reservation values(35,106,"First Class","Non-Stop",1541135422,1541135440,912);
+insert into reservation values(36,111,"First Class","Non-Stop",1541135422,1541135440,879);
+insert into reservation values(37,110,"First Class","Non-Stop",1541135422,1541135440,934);

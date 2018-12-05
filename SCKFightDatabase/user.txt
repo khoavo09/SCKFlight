@@ -1,0 +1,6 @@
+insert into user values("jsmith@smth.co","somegoodpw","user");
+insert into user values("cgibson@smth.co","admin1","admin");
+insert into user values("aromero@smth.co","user2","user");
+insert into user values("svelez@smth.co","user3","user");
+insert into user values("frhodes@smth.co","user4","user");
+insert into user values("jyork@smth.co","user5","user");

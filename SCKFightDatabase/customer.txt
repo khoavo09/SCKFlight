@@ -1,0 +1,12 @@
+insert into customer values(1,"John Smith",22,"jsmith@smth.co");
+insert into customer values(2,"John Smith",24,"jsmith@smth.co");
+insert into customer values(3,"John Smith",26,"jsmith@smth.co");
+insert into customer values(4,"John Smith",27,"jsmith@smth.co");
+insert into customer values(5,"Cristopher Gibson",25,"cgibson@smth.co");
+insert into customer values(6,"Cristopher Gibson",23,"cgibson@smth.co");
+insert into customer values(7,"Addison Romero",29,"aromero@smth.co");
+insert into customer values(8,"Stephanie Velez",28,"svelez@smth.co");
+insert into customer values(9,"Stephanie Velez",30,"svelez@smth.co");
+insert into customer values(10,"Jared Rhodes",32,"frhodes@smth.co");
+insert into customer values(11,"Jared Rhodes",31,"frhodes@smth.co");
+insert into customer values(12,"Jaydan York",34,"jyork@smth.co");
