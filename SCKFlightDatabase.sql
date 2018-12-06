@@ -43,6 +43,7 @@ CREATE TABLE Schedule
  flightID INT,
  departTime TIME,
  arrivalTime TIME,
+ date DATE,
  status VARCHAR(10),
  PRIMARY KEY (scheduleID),
  FOREIGN KEY (flightID) REFERENCES FLIGHT(flightID) ON UPDATE CASCADE ON DELETE CASCADE
@@ -198,16 +199,16 @@ insert into customer values(10,"Jared Rhodes",32,"frhodes@smth.co");
 insert into customer values(11,"Jared Rhodes",31,"frhodes@smth.co");
 insert into customer values(12,"Jaydan York",34,"jyork@smth.co");
 
-insert into schedule values (1,100,'2:00','4:30',"On Time");
-insert into schedule values (2,101,'12:00','23:30',"On Time");
-insert into schedule values (3,102,'2:10','7:30',"On Time");
-insert into schedule values (4,103,'3:50','15:30',"On Time");
-insert into schedule values (5,104,'2:20','4:30',"On Time");
-insert into schedule values (6,105,'1:00','6:20',"On Time");
-insert into schedule values (7,106,'8:00','15:30',"On Time");
-insert into schedule values (8,107,'9:20','19:30',"On Time");
-insert into schedule values (9,108,'3:20','22:20',"On Time");
-insert into schedule values (10,109,'2:40','10:30',"On Time");
-insert into schedule values (11,110,'1:20','23:10',"On Time");
-insert into schedule values (12,111,'3:20','12:30',"On Time");
-insert into schedule values (13,112,'2:00','14:30',"On Time");
+insert into schedule values (1,100,'2:00','4:30','2019-09-10',"On Time");
+insert into schedule values (2,101,'12:00','23:30','2019-09-11',"On Time");
+insert into schedule values (3,102,'2:10','7:30','2019-09-12',"On Time");
+insert into schedule values (4,103,'3:50','15:30','2019-09-13',"On Time");
+insert into schedule values (5,104,'2:20','4:30','2019-09-14',"On Time");
+insert into schedule values (6,105,'1:00','6:20','2019-09-15',"On Time");
+insert into schedule values (7,106,'8:00','15:30','2019-09-16',"On Time");
+insert into schedule values (8,107,'9:20','19:30','2019-09-17',"On Time");
+insert into schedule values (9,108,'3:20','22:20','2019-09-18',"On Time");
+insert into schedule values (10,109,'2:40','10:30','2019-09-19',"On Time");
+insert into schedule values (11,110,'1:20','23:10','2019-09-20',"On Time");
+insert into schedule values (12,111,'3:20','12:30','2019-09-21',"On Time");
+insert into schedule values (13,112,'2:00','14:30','2019-09-22',"On Time");
