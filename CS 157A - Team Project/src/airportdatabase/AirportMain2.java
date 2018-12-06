@@ -33,8 +33,8 @@ public class AirportMain2 {
 			  e.printStackTrace();
 		}
     
+		//GUI declarations
 		JFrame frame = new JFrame();
-		frame.setSize(650,300);
 		JPanel login = new JPanel();
 		JButton button1 = new JButton("Log in");
 		JButton button2 = new JButton("Create Account");
@@ -93,13 +93,7 @@ public class AirportMain2 {
 							
 							frame.dispose();
 							frame2.dispose();
-							
-							if(userType.equals("user"))
-								userMainMenu(connect);
-							else if(userType.equals("admin"))
-								adminMainMenu(connect);
-							else
-								;
+							mainMenu(connect, userType);
 							
 						}
 						
@@ -200,20 +194,6 @@ public class AirportMain2 {
 				
 			});
 			
-			/*
-					int ID = Integer.parseInt(text.getText());
-					String reserve = "DELETE FROM RESERVATION WHERE reservationID = ?;";
-					try {
-					PreparedStatement pre = connect.prepareStatement(reserve);
-					pre.setInt(1, ID);
-					pre.executeUpdate();
-					} catch(SQLException se){
-						 se.printStackTrace();
-					}
-					
-					frame.dispose();
-					*/
-			
 			JPanel buttons = new JPanel();
 			buttons.add(ok);
 			buttons.add(cancel);
@@ -249,200 +229,12 @@ public class AirportMain2 {
 		frame.setResizable(false);
 	}
 	
-	public static void userMainMenu(Connection connect) {
+	public static void mainMenu(Connection connection, String userType) {
 		JFrame frame = new JFrame();
 		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 		JLabel title = new JLabel("Welcome to SCK Flights");
-		JLabel loggedIn = new JLabel("Logged in as user.");
-		loggedIn.setFont(new Font("Helvetica", Font.BOLD, 24));
-		title.setFont(new Font("Helvetica", Font.BOLD, 48));
-		JButton createReservation = new JButton("Create Reservation");
-		JButton cancelReservation = new JButton("Cancel Reservation");
-		JButton viewSchedule = new JButton("View Schedule");
-		JButton viewReservation = new JButton("View Reservation");
-		JButton modifyInformation = new JButton("Modify Information");
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		
-		createReservation.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				JFrame frame = new JFrame();
-				JPanel panel = new JPanel();
-				JRadioButton[] radiobuttons;
-				JButton[] buttons;
-				JLabel title = new JLabel("Select your flight:");
-				JLabel label3 = new JLabel(String.format("%-5s %-23s %-10s %-15s %-15s %-16s %-1s", "ID", "Airlines", "Model", "Depart from", "Arrive at", "Depart Time", "Arrival Time"));
-				title.setFont(new Font("Serif", Font.PLAIN, 24));
-				label3.setFont(new Font("Serif", Font.PLAIN, 18));
-				panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-				String availableFlights = "SELECT airlineName FROM Flight;";
-				String numberOfFlights = "SELECT count(*) AS TOTAL FROM Flight;";
-				Statement stmt = null;
-				ResultSet rs = null;
-			
-				try {
-					stmt = connect.createStatement();
-					rs = stmt.executeQuery(numberOfFlights);
-					rs.next();
-					int index = rs.getInt("TOTAL");
-					radiobuttons = new JRadioButton[index];
-					buttons = new JButton[index];
-					panel.setLayout(new GridLayout(index + 1, 2, 5, 5));
-					ButtonGroup groups = new ButtonGroup();
-					JButton ok = new JButton("ok");
-					JButton cancel = new JButton("cancel");
-					
-					cancel.addActionListener(new ActionListener() {
-
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							frame.dispose();
-						}
-						
-					});
-					
-					rs = stmt.executeQuery(availableFlights);
-					rs.next();
-					
-					for(int i = 0; i < radiobuttons.length; i++) {
-						String airlineName = rs.getString("airlineName");
-						radiobuttons[i] = new JRadioButton(airlineName);
-						buttons[i] = new JButton("View Info");
-						
-						buttons[i].addActionListener(new ActionListener() {
-
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								JFrame frame = new JFrame();
-								frame.setLayout(new GridLayout(7, 2, 5, 5));
-								JLabel[] labels = new JLabel[7];
-								JLabel[] infos = new JLabel[7];
-								String flightInformation = "SELECT FLIGHT.flightID AS flightID, airlineName, model, departAirport, arriveAirport, departTime, arrivalTime FROM FLIGHT, SCHEDULE WHERE FLIGHT.flightID = SCHEDULE.flightID AND airlineName = ?;";
-								ResultSet rs2 = null;
-								
-								try {
-									PreparedStatement pre = connect.prepareStatement(flightInformation);
-									pre.setString(1, airlineName);
-									rs2 = pre.executeQuery();
-									rs2.next();
-									
-									labels[0] = new JLabel("Flight ID:");
-									labels[1] = new JLabel("AirlineName:");
-									labels[2] = new JLabel("Model:");
-									labels[3] = new JLabel("Departure Airport:");
-									labels[4] = new JLabel("Arrival Airport:");
-									labels[5] = new JLabel("Departure Time:");
-									labels[6] = new JLabel("Arrival Time:");
-									infos[0] = new JLabel(rs2.getString("flightID"));
-									infos[1] = new JLabel(rs2.getString("airlineName"));
-									infos[2] = new JLabel(rs2.getString("model"));
-									infos[3] = new JLabel(rs2.getString("departAirport"));
-									infos[4] = new JLabel(rs2.getString("arriveAirport"));
-									infos[5] = new JLabel(rs2.getString("departTime"));
-									infos[6] = new JLabel(rs2.getString("arrivalTime"));
-									
-									for(int i = 0; i < labels.length; i++) {
-										labels[i].setFont(new Font("Serif", Font.PLAIN, 36));
-										infos[i].setFont(new Font("Arial", Font.BOLD, 36));
-										frame.add(labels[i]);
-										frame.add(infos[i]);
-									}
-										
-									
-								} catch (SQLException e1) {
-									e1.printStackTrace();
-								}
-								
-								//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-								frame.pack();
-								frame.setLocationRelativeTo(null);
-								frame.setVisible(true);
-								frame.setResizable(false);
-							}
-							
-						});
-						
-						rs.next();
-						groups.add(radiobuttons[i]);
-						panel.add(radiobuttons[i]);
-						panel.add(buttons[i]);
-					}
-					
-					ok.addActionListener(new ActionListener() {
-
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							JFrame frame2 = new JFrame();
-							String selected = "You have selected ";
-							JTextField nameText = new JTextField(10);
-							//JTextField nameText = new JTextField(10);
-							//JTextField nameText = new JTextField(10);
-							
-							
-							for(int i = 0; i < radiobuttons.length; i++) {
-								if(radiobuttons[i].isSelected())
-									selected += radiobuttons[i].getText();
-							}
-							
-							JLabel title = new JLabel(selected);
-							frame2.add(title);
-							
-							frame2.pack();
-							frame2.setLocationRelativeTo(null);
-							frame2.setVisible(true);
-							frame2.setResizable(false);
-							frame.dispose();
-						}
-						
-					});
-					
-					panel.add(ok);
-					panel.add(cancel);
-					frame.add(panel);
-					
-				} catch(SQLException se){
-				   se.printStackTrace();
-				}
-				
-				//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frame.pack();
-				frame.setLocationRelativeTo(null);
-				frame.setVisible(true);
-				frame.setResizable(false);
-				
-			}
-		});
-				
-		
-		panel.add(createReservation, gbc);
-		panel.add(cancelReservation, gbc);
-		panel.add(viewSchedule, gbc);
-		panel.add(viewReservation, gbc);
-		panel.add(modifyInformation, gbc);
-		frame.add(title);
-		frame.add(loggedIn);
-		frame.add(panel);
-		
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-		frame.setResizable(false);
-	}
-	
-	public static void adminMainMenu(Connection connection) {
-		JFrame frame = new JFrame();
-		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		JLabel title = new JLabel("Welcome to SCK Flights");
-		JLabel loggedIn = new JLabel("Logged in as admin.");
-		loggedIn.setFont(new Font("Helvetica", Font.BOLD, 24));
 		title.setFont(new Font("Helvetica", Font.BOLD, 48));
 		JButton createReservation = new JButton("Create Reservation");
 		JButton cancelReservation = new JButton("Cancel Reservation");
@@ -455,15 +247,26 @@ public class AirportMain2 {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		JLabel loggedIn = new JLabel();
+		loggedIn.setFont(new Font("Helvetica", Font.BOLD, 24));
+		
+		if(userType.equals("admin"))
+			loggedIn.setText("Logged in as admin.");
+		else
+			loggedIn.setText("Logged in as user.");
 		
 		panel.add(createReservation, gbc);
 		panel.add(cancelReservation, gbc);
 		panel.add(viewSchedule, gbc);
 		panel.add(viewReservation, gbc);
 		panel.add(modifyInformation, gbc);
-		panel.add(viewStatistics, gbc);
-		panel.add(modifySchedule, gbc);
-		panel.add(addNewItem, gbc);
+		
+		if(userType.equals("admin")) {
+			panel.add(viewStatistics, gbc);
+			panel.add(modifySchedule, gbc);
+			panel.add(addNewItem, gbc);
+		}
+		
 		frame.add(title);
 		frame.add(loggedIn);
 		frame.add(panel);
