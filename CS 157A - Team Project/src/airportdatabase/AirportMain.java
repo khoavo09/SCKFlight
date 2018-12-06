@@ -9,18 +9,19 @@ import javax.swing.*;
 public class AirportMain {
 
 	// JDBC driver name and database URL
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";  
 	static final String DB_URL = "jdbc:mysql://localhost/SCKFlightDatabase";
 
 	//  Database credentials
 	static final String USER = "root";
-	static final String PASS = "Sh@d0wmage5";
+	//static final String PASS = "Sh@d0wmage5";
+	static final String PASS = "laishingling";
 	   
 	public static void main(String[] args) {
 		Connection conn = null;
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName("com.mysql.cj.jdbc.Driver");
 		    System.out.println("Connecting to database...");
 		    conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			      
