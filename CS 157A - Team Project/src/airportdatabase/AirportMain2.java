@@ -1,4 +1,3 @@
-package airportdatabase;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -6,10 +5,12 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
-public class AirportMain2 {
+public class AirportMain {
 
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
@@ -17,7 +18,10 @@ public class AirportMain2 {
 
 	//  Database credentials
 	static final String USER = "root";
-	static final String PASS = "Sh@d0wmage5"; //replace with your password
+	static final String PASS = "laishingling"; //replace with your password
+	
+	static String EMAIL = "";
+	static String USERPASS = "";
 	   
 	public static void main(String[] args) {
 		Connection conn = null;
@@ -38,6 +42,7 @@ public class AirportMain2 {
 		JPanel login = new JPanel();
 		JButton button1 = new JButton("Log in");
 		JButton button2 = new JButton("Create Account");
+		
 		
 		final Connection connect = conn;
     
@@ -75,15 +80,15 @@ public class AirportMain2 {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					ResultSet rs2 = null; 
-					String email = text1.getText();
-					String password = text2.getText();
+				    EMAIL = text1.getText();
+					USERPASS = text2.getText();
 					String userType;
 					String check = "SELECT * FROM USER WHERE email = ? AND password = ?;";
 							
 					try {
 						PreparedStatement pre = connect.prepareStatement(check);
-						pre.setString(1, email);
-						pre.setString(2, password);
+						pre.setString(1, EMAIL);
+						pre.setString(2, USERPASS);
 						rs2 = pre.executeQuery();
 						if(!rs2.next())
 							flag.setVisible(true);
@@ -249,6 +254,501 @@ public class AirportMain2 {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		JLabel loggedIn = new JLabel();
 		loggedIn.setFont(new Font("Helvetica", Font.BOLD, 24));
+		
+		createReservation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg1) {
+				
+				JFrame frame = new JFrame();
+				JPanel panel = new JPanel();
+				panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+				JLabel title = new JLabel("Please select a flight:");
+				JButton okButton = new JButton("OK");
+				JButton cancelButton = new JButton("Cancel");
+				title.setFont(new Font("Helvetica", Font.BOLD, 36));
+				String listSchedule = "SELECT Flight.flightID, airlineName, model, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime FROM FLIGHT, SCHEDULE WHERE FLIGHT.flightID = SCHEDULE.flightID ORDER BY departTime;";
+				Statement stmt = null;
+				ResultSet rs = null;
+				try {
+					stmt = connection.createStatement();
+					rs = stmt.executeQuery(listSchedule);
+					ResultSetMetaData metaData = rs.getMetaData();
+				    int columnCount = metaData.getColumnCount();
+				    Vector<String> columnNames = new Vector<String>();
+				    columnNames.add("ID");
+				    columnNames.add("Airline");
+				    columnNames.add("Airplane Model");
+				    columnNames.add("Departure Airport");
+				    columnNames.add("Arrival Airport");
+				    columnNames.add("Date");
+				    columnNames.add("Departure Time");
+				    columnNames.add("Arrival Time");
+					Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+				    while (rs.next()) {
+				        Vector<Object> vector = new Vector<Object>();
+				        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+				            vector.add(rs.getObject(columnIndex));
+				        }
+				        data.add(vector);
+				    }
+				    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+				    	@Override
+				        public boolean isCellEditable(int row, int column) {
+				           return false;
+				        }
+				    };
+				    JTable table = new JTable(myModel);
+				    JScrollPane scrollPane = new JScrollPane(table);
+				    table.setFillsViewportHeight(true);
+				    
+				    okButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+						int flightID = (int) table.getValueAt(table.getSelectedRow(), 0);
+						JFrame innerFrame = new JFrame();
+						JPanel innerPanel = new JPanel();
+						innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.PAGE_AXIS));
+						JLabel title = new JLabel("Please choose from the following:");
+						JLabel namePrompt = new JLabel("Enter name:");
+						JLabel priceLabel = new JLabel("Price: ");
+						JTextField nameTextField = new JTextField(20);
+						JRadioButton classButton1 = new JRadioButton("First Class");
+						classButton1.setActionCommand("First Class");
+						classButton1.addActionListener(new ActionListener() {
+					        @Override
+					        public void actionPerformed(ActionEvent e) {
+					            priceLabel.setText("Price: $900");
+
+					        }
+					    });
+						JRadioButton classButton2 = new JRadioButton("Business");
+						classButton2.setActionCommand("Business");
+						classButton2.addActionListener(new ActionListener() {
+					        @Override
+					        public void actionPerformed(ActionEvent e) {
+					            priceLabel.setText("Price: $500");
+
+					        }
+					    });
+						JRadioButton classButton3 = new JRadioButton("Economy");
+						classButton3.setActionCommand("Economy");
+						classButton3.addActionListener(new ActionListener() {
+					        @Override
+					        public void actionPerformed(ActionEvent e) {
+					            priceLabel.setText("Price: $300");
+
+					        }
+					    });
+						ButtonGroup classGroup = new ButtonGroup();
+					    classGroup.add(classButton1);
+					    classGroup.add(classButton2);
+					    classGroup.add(classButton3);
+					    JRadioButton typeButton1 = new JRadioButton("Non-stop");
+					    typeButton1.setActionCommand("Non-stop");
+					    JRadioButton typeButton2 = new JRadioButton("Connecting");
+					    typeButton2.setActionCommand("Connecting");
+					    ButtonGroup typeGroup = new ButtonGroup();
+					    typeGroup.add(typeButton1);
+					    typeGroup.add(typeButton2);
+						JButton innerOkButton = new JButton("Ok");
+						JButton innerCancelButton = new JButton("Cancel");
+						innerPanel.add(title);
+						innerPanel.add(namePrompt);
+						innerPanel.add(nameTextField);
+						innerPanel.add(classButton1);
+						innerPanel.add(classButton2);
+						innerPanel.add(classButton3);
+						innerPanel.add(typeButton1);
+						innerPanel.add(typeButton2);
+						innerPanel.add(priceLabel);
+						innerPanel.add(innerOkButton);
+						innerPanel.add(innerCancelButton);
+						innerFrame.add(innerPanel);
+						innerFrame.pack();
+						innerFrame.setLocationRelativeTo(null);
+						innerFrame.setVisible(true);
+						innerFrame.setResizable(true);
+						
+						innerOkButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								int price = Integer.parseInt(priceLabel.getText().substring(8, priceLabel.getText().length()));
+								String resInsert = "insert into reservation(flightID, class, type, updatedOn, price) values (?, ?, ?, CURDATE(), ?);";
+								String cusInsert = "insert into customer(name, reservationID, email) values(?, ?, ?);";
+								PreparedStatement pre;
+								PreparedStatement pre2;
+								try {
+									pre = connection.prepareStatement(resInsert);
+									pre.setInt(1, flightID);
+									pre.setString(2, classGroup.getSelection().getActionCommand());
+									pre.setString(3, typeGroup.getSelection().getActionCommand());
+									pre.setInt(4, price);
+									pre.executeUpdate();
+									Statement stmt2 = connection.createStatement();
+									ResultSet rs2 = stmt2.executeQuery("select max(reservationID) from reservation;");
+									rs2.next();
+									int reservationID = rs2.getInt("max(reservationID)");
+									pre2 = connection.prepareStatement(cusInsert);
+									pre2.setString(1, nameTextField.getText());
+									pre2.setInt(2, reservationID);
+									pre2.setString(3, EMAIL);
+									pre2.executeUpdate();
+									
+									System.out.println("Confirmed reservation.");
+									innerFrame.dispose();
+									frame.dispose();
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							}
+						});
+						
+						innerCancelButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent arg0) {
+								innerFrame.dispose();
+							}
+						});
+						
+						}
+					});
+					
+					cancelButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							frame.dispose();
+						}
+					});
+				    
+				    panel.add(title);
+				    panel.add(scrollPane);
+				    panel.add(okButton);
+				    panel.add(cancelButton);
+					frame.add(panel);
+					frame.pack();
+					frame.setLocationRelativeTo(null);
+					frame.setVisible(true);
+					frame.setResizable(true);
+				} catch(SQLException se){
+						se.printStackTrace();
+						}
+			}
+		});
+		
+		cancelReservation.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				JFrame cancelFrame = new JFrame();
+				JPanel cancelPanel = new JPanel();
+				cancelPanel.setLayout(new BoxLayout(cancelPanel, BoxLayout.PAGE_AXIS));
+				JLabel nameLabel = new JLabel("Select a reservation:");
+				String cancelQuery = "select Reservation.reservationID, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule where reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID and reservationID in (select reservationID from customer where email = '"+EMAIL+"') order by date;";
+				if(userType.equals("admin"))
+					cancelQuery = "select Reservation.reservationID, name, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule, customer where customer.reservationID = reservation.reservationID and reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID order by date;";
+				Statement stmt = null;
+				ResultSet rs = null;
+				try {
+					stmt = connection.createStatement();
+					rs = stmt.executeQuery(cancelQuery);
+					ResultSetMetaData metaData = rs.getMetaData();
+				    int columnCount = metaData.getColumnCount();
+				    Vector<String> columnNames = new Vector<String>();
+				    columnNames.add("ID");
+				    columnNames.add("Airline");
+				    columnNames.add("Class");
+				    columnNames.add("Departure Airport");
+				    columnNames.add("Arrival Airport");
+				    columnNames.add("Date");
+				    columnNames.add("Departure Time");
+				    columnNames.add("Arrival Time");
+				    columnNames.add("Type");
+				    columnNames.add("Price");
+					Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+				    while (rs.next()) {
+				        Vector<Object> vector = new Vector<Object>();
+				        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+				            vector.add(rs.getObject(columnIndex));
+				        }
+				        data.add(vector);
+				    }
+				    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+				    	@Override
+				        public boolean isCellEditable(int row, int column) {
+				           return false;
+				        }
+				    };
+				    JTable cancelTable = new JTable(myModel);
+				    JScrollPane cancelScrollPane = new JScrollPane(cancelTable);
+				    cancelTable.setFillsViewportHeight(true);
+				    JButton cancelOKButton = new JButton("Ok");
+				    cancelOKButton.addActionListener(new ActionListener() {
+				    	public void actionPerformed(ActionEvent arg0) {
+				    		String resDelete = "delete from reservation where reservationID = ?";
+				    		PreparedStatement pre;
+							try {
+								int reservationID = (int) cancelTable.getValueAt(cancelTable.getSelectedRow(), 0);
+								pre = connection.prepareStatement(resDelete);
+								pre.setInt(1, reservationID);
+								pre.executeUpdate();
+								System.out.println("Confirmed cancellation.");
+								cancelFrame.dispose();
+								frame.dispose();
+							} catch (SQLException e) {
+								e.printStackTrace();		
+				    	}
+					}
+				    });
+				    JButton cancelCancelButton = new JButton("Cancel");
+				    cancelCancelButton.addActionListener(new ActionListener() {
+				    	public void actionPerformed(ActionEvent arg0) {
+				    		cancelFrame.dispose();
+				    	}
+				    });
+				    cancelPanel.add(nameLabel);
+				    cancelPanel.add(cancelScrollPane);
+				    cancelPanel.add(cancelOKButton);
+				    cancelPanel.add(cancelCancelButton);
+				    cancelFrame.add(cancelPanel);
+				    cancelFrame.pack();
+					cancelFrame.setLocationRelativeTo(null);
+					cancelFrame.setVisible(true);
+					cancelFrame.setResizable(true);
+				    
+			} catch (SQLException s) {
+				s.printStackTrace();}
+			}
+		});
+		
+		viewSchedule.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFrame viewFrame = new JFrame();
+				JPanel viewPanel = new JPanel();
+				viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.PAGE_AXIS));
+				JLabel viewTitle = new JLabel("Schedule");
+				String listSchedule = "SELECT Flight.flightID, airlineName, model, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime FROM FLIGHT, SCHEDULE WHERE FLIGHT.flightID = SCHEDULE.flightID ORDER BY departTime;";
+				Statement stmt = null;
+				ResultSet rs = null;
+				try {
+					stmt = connection.createStatement();
+					rs = stmt.executeQuery(listSchedule);
+					ResultSetMetaData metaData = rs.getMetaData();
+				    int columnCount = metaData.getColumnCount();
+				    Vector<String> columnNames = new Vector<String>();
+				    columnNames.add("ID");
+				    columnNames.add("Airline");
+				    columnNames.add("Airplane Model");
+				    columnNames.add("Departure Airport");
+				    columnNames.add("Arrival Airport");
+				    columnNames.add("Date");
+				    columnNames.add("Departure Time");
+				    columnNames.add("Arrival Time");
+					Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+				    while (rs.next()) {
+				        Vector<Object> vector = new Vector<Object>();
+				        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+				            vector.add(rs.getObject(columnIndex));
+				        }
+				        data.add(vector);
+				    }
+				    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+				    	@Override
+				        public boolean isCellEditable(int row, int column) {
+				           return false;
+				        }
+				    };
+				    JTable viewTable = new JTable(myModel);
+				    JScrollPane viewScrollPane = new JScrollPane(viewTable);
+				    viewTable.setFillsViewportHeight(true);
+				    viewPanel.add(viewTitle);
+				    viewPanel.add(viewScrollPane);
+				    viewFrame.add(viewPanel);
+				    viewFrame.pack();
+					viewFrame.setLocationRelativeTo(null);
+					viewFrame.setVisible(true);
+					viewFrame.setResizable(true);
+			} catch(SQLException se) {
+				se.printStackTrace();
+				}
+			
+			}
+		});
+		
+		viewReservation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame viewResFrame = new JFrame();
+				JPanel viewResPanel = new JPanel();
+				viewResPanel.setLayout(new BoxLayout(viewResPanel, BoxLayout.PAGE_AXIS));
+				JLabel nameLabel = new JLabel("Reservations");
+				String viewQuery = "select Reservation.reservationID, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule where reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID and reservationID in (select reservationID from customer where email = '"+EMAIL+"') order by date;";
+				if(userType.equals("admin"))
+					viewQuery = "select Reservation.reservationID, name, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule, customer where customer.reservationID = reservation.reservationID and reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID order by date;";
+				Statement stmt = null;
+				ResultSet rs = null;
+				try {
+					stmt = connection.createStatement();
+					rs = stmt.executeQuery(viewQuery);
+					ResultSetMetaData metaData = rs.getMetaData();
+				    int columnCount = metaData.getColumnCount();
+				    Vector<String> columnNames = new Vector<String>();
+				    columnNames.add("ID");
+				    columnNames.add("Airline");
+				    columnNames.add("Class");
+				    columnNames.add("Departure Airport");
+				    columnNames.add("Arrival Airport");
+				    columnNames.add("Date");
+				    columnNames.add("Departure Time");
+				    columnNames.add("Arrival Time");
+				    columnNames.add("Type");
+				    columnNames.add("Price");
+					Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+				    while (rs.next()) {
+				        Vector<Object> vector = new Vector<Object>();
+				        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+				            vector.add(rs.getObject(columnIndex));
+				        }
+				        data.add(vector);
+				    }
+				    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+				    	@Override
+				        public boolean isCellEditable(int row, int column) {
+				           return false;
+				        }
+				    };
+				    JTable viewResTable = new JTable(myModel);
+				    JScrollPane viewResScrollPane = new JScrollPane(viewResTable);
+				    viewResTable.setFillsViewportHeight(true);
+				    viewResPanel.add(nameLabel);
+				    viewResPanel.add(viewResScrollPane);
+				    viewResFrame.add(viewResPanel);
+				    viewResFrame.pack();
+					viewResFrame.setLocationRelativeTo(null);
+					viewResFrame.setVisible(true);
+					viewResFrame.setResizable(true);
+			} catch(SQLException se) {
+				se.printStackTrace();
+				}
+			}
+		});
+		
+		modifyInformation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame modFrame = new JFrame();
+				JPanel modPanel = new JPanel();
+				modPanel.setLayout(new BoxLayout(modPanel, BoxLayout.PAGE_AXIS));
+				JLabel emailLabel = new JLabel("Email: "+EMAIL);
+				JButton changeEmail = new JButton("Change");
+				JLabel passLabel = new JLabel("Password: "+USERPASS);
+				JButton changePass = new JButton("Change");
+				changeEmail.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JFrame emailFrame = new JFrame();
+						JPanel emailPanel = new JPanel();
+						emailPanel.setLayout(new BoxLayout(emailPanel, BoxLayout.PAGE_AXIS));
+						JLabel newEmail = new JLabel("New Email: ");
+						JTextField newEmailField = new JTextField(EMAIL);
+						JLabel passConfirm = new JLabel("Password");
+						JTextField passConfirmField = new JTextField(20);
+						JButton emailOK = new JButton("Ok");
+						JButton emailCancel = new JButton("Cancel");
+						
+						emailOK.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								if (passConfirmField.getText().equals(USERPASS)) {
+								String emailQuery = "update user set email = ? where email = ?";
+								PreparedStatement pre;
+								try {
+									pre = connection.prepareStatement(emailQuery);
+									pre.setString(1, newEmailField.getText());
+									pre.setString(2, EMAIL);
+									pre.executeUpdate();								
+									System.out.println("Confirmed update of email.");
+									EMAIL = newEmailField.getText();
+									emailFrame.dispose();
+									modFrame.dispose();
+								} catch (SQLException ex) {
+									ex.printStackTrace();
+								}}
+								else System.out.println("Invalid password");
+							}
+						});
+						emailCancel.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								emailFrame.dispose();
+							}
+						});
+						emailPanel.add(newEmail);
+						emailPanel.add(newEmailField);
+						emailPanel.add(passConfirm);
+						emailPanel.add(passConfirmField);
+						emailPanel.add(emailOK);
+						emailPanel.add(emailCancel);
+						emailFrame.add(emailPanel);
+						emailFrame.pack();
+						emailFrame.setLocationRelativeTo(null);
+						emailFrame.setVisible(true);
+						emailFrame.setResizable(true);
+					}
+				});
+				changePass.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JFrame passFrame = new JFrame();
+						JPanel passPanel = new JPanel();
+						passPanel.setLayout(new BoxLayout(passPanel, BoxLayout.PAGE_AXIS));
+						JLabel newPass = new JLabel("New Password: ");
+						JTextField newPassField = new JTextField(20);
+						JLabel oldPass = new JLabel("Old Password: ");
+						JTextField oldPassField = new JTextField(20);
+						JButton passOK = new JButton("Ok");
+						JButton passCancel = new JButton("Cancel");
+						
+						passOK.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								if (oldPassField.getText().equals(USERPASS)) {
+								String passQuery = "update user set password = ? where password = ?";
+								PreparedStatement pre;
+								try {
+									pre = connection.prepareStatement(passQuery);
+									pre.setString(1, newPassField.getText());
+									pre.setString(2, USERPASS);
+									pre.executeUpdate();								
+									System.out.println("Confirmed update of password.");
+									USERPASS = newPassField.getText();
+									passFrame.dispose();
+									modFrame.dispose();
+								} catch (SQLException ex) {
+									ex.printStackTrace();
+								}}
+								else System.out.println("Invalid password");
+							}
+						});
+						passCancel.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								passFrame.dispose();
+							}
+						});
+						passPanel.add(newPass);
+						passPanel.add(newPassField);
+						passPanel.add(oldPass);
+						passPanel.add(oldPassField);
+						passPanel.add(passOK);
+						passPanel.add(passCancel);
+						passFrame.add(passPanel);
+						passFrame.pack();
+						passFrame.setLocationRelativeTo(null);
+						passFrame.setVisible(true);
+						passFrame.setResizable(true);
+					}
+				});
+				modPanel.add(emailLabel);
+				modPanel.add(changeEmail);
+				modPanel.add(passLabel);
+				modPanel.add(changePass);
+				modFrame.add(modPanel);
+				modFrame.pack();
+				modFrame.setLocationRelativeTo(null);
+				modFrame.setVisible(true);
+				modFrame.setResizable(true);
+				
+			}
+		});
 		
 		if(userType.equals("admin"))
 			loggedIn.setText("Logged in as admin.");
