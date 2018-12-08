@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.Vector;
+import java.util.Date;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -577,7 +578,7 @@ public class AirportMain {
 				JPanel viewResPanel = new JPanel();
 				viewResPanel.setLayout(new BoxLayout(viewResPanel, BoxLayout.PAGE_AXIS));
 				JLabel nameLabel = new JLabel("Reservations");
-				String viewQuery = "select Reservation.reservationID, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule where reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID and reservationID in (select reservationID from customer where email = '"+EMAIL+"') order by date;";
+				String viewQuery = "select Reservation.reservationID, name, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule, customer where customer.reservationID = reservation.reservationID and reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID and Reservation.reservationID in (select reservationID from customer where email = '"+EMAIL+"') order by date;";
 				if(userType.equals("admin"))
 					viewQuery = "select Reservation.reservationID, name, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule, customer where customer.reservationID = reservation.reservationID and reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID order by date;";
 				Statement stmt = null;
@@ -589,6 +590,7 @@ public class AirportMain {
 				    int columnCount = metaData.getColumnCount();
 				    Vector<String> columnNames = new Vector<String>();
 				    columnNames.add("ID");
+				    columnNames.add("Name");
 				    columnNames.add("Airline");
 				    columnNames.add("Class");
 				    columnNames.add("Departure Airport");
@@ -747,6 +749,486 @@ public class AirportMain {
 				modFrame.setVisible(true);
 				modFrame.setResizable(true);
 				
+			}
+		});
+		
+		viewStatistics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame viewStatsFrame = new JFrame();
+				JPanel viewStatsPanel = new JPanel();
+				viewStatsPanel.setLayout(new BoxLayout(viewStatsPanel, BoxLayout.PAGE_AXIS));
+				JButton viewSales = new JButton("View Sales of All Flights For Past Month");
+				JButton viewUnsold = new JButton("View Unsold Seats");
+				JButton viewFrequent = new JButton("View Frequent Fliers");
+				viewSales.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JFrame salesFrame = new JFrame();
+						JPanel salesPanel = new JPanel();
+						salesPanel.setLayout(new BoxLayout(salesPanel, BoxLayout.PAGE_AXIS));
+						String salesQuery = "select airlineName, sum(price) from reservation, flight where reservation.flightID = flight.flightID and updatedOn <= CURDATE() and updatedOn >= DATE_SUB(NOW(), INTERVAL 1 MONTH) group by airlineName;";
+						Statement salesStmt = null;
+						ResultSet salesRs = null;
+						try {
+							salesStmt = connection.createStatement();
+							salesRs = salesStmt.executeQuery(salesQuery);
+							ResultSetMetaData metaData = salesRs.getMetaData();
+						    int columnCount = metaData.getColumnCount();
+						    Vector<String> columnNames = new Vector<String>();
+						    columnNames.add("Airline");
+						    columnNames.add("Amount");
+							Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+						    while (salesRs.next()) {
+						        Vector<Object> vector = new Vector<Object>();
+						        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+						            vector.add(salesRs.getObject(columnIndex));
+						        }
+						        data.add(vector);
+						    }
+						    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+						    	@Override
+						        public boolean isCellEditable(int row, int column) {
+						           return false;
+						        }
+						    };
+						    JTable salesTable = new JTable(myModel);
+						    JScrollPane salesScrollPane = new JScrollPane(salesTable);
+						    salesTable.setFillsViewportHeight(true);
+						    salesPanel.add(salesScrollPane);
+						    salesFrame.add(salesPanel);
+							salesFrame.pack();
+							salesFrame.setLocationRelativeTo(null);
+							salesFrame.setVisible(true);
+							salesFrame.setResizable(true);
+					} catch (SQLException se) {
+						se.printStackTrace();}
+					}
+				});
+				viewUnsold.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JFrame unsoldFrame = new JFrame();
+						JPanel unsoldPanel = new JPanel();
+						unsoldPanel.setLayout(new BoxLayout(unsoldPanel, BoxLayout.PAGE_AXIS));
+						String unsoldQuery = "select airlineName, round(avg(availableSeats)) from flight where flightid in (select flightid from reservation where updatedon <= curdate() and updatedon >= date_sub(now(), interval 1 month)) group by airlinename;";
+						Statement unsoldStmt = null;
+						ResultSet unsoldRs = null;
+						try {
+							unsoldStmt = connection.createStatement();
+							unsoldRs = unsoldStmt.executeQuery(unsoldQuery);
+							ResultSetMetaData metaData = unsoldRs.getMetaData();
+						    int columnCount = metaData.getColumnCount();
+						    Vector<String> columnNames = new Vector<String>();
+						    columnNames.add("Airline");
+						    columnNames.add("Average Number of Unsold Seats");
+							Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+						    while (unsoldRs.next()) {
+						        Vector<Object> vector = new Vector<Object>();
+						        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+						            vector.add(unsoldRs.getObject(columnIndex));
+						        }
+						        data.add(vector);
+						    }
+						    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+						    	@Override
+						        public boolean isCellEditable(int row, int column) {
+						           return false;
+						        }
+						    };
+						    JTable unsoldTable = new JTable(myModel);
+						    JScrollPane unsoldScrollPane = new JScrollPane(unsoldTable);
+						    unsoldTable.setFillsViewportHeight(true);
+						    unsoldPanel.add(unsoldScrollPane);
+						    unsoldFrame.add(unsoldPanel);
+							unsoldFrame.pack();
+							unsoldFrame.setLocationRelativeTo(null);
+							unsoldFrame.setVisible(true);
+							unsoldFrame.setResizable(true);
+					} catch (SQLException se) {
+						se.printStackTrace();}
+					}
+				});
+				viewFrequent.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JFrame frequentFrame = new JFrame();
+						JPanel frequentPanel = new JPanel();
+						frequentPanel.setLayout(new BoxLayout(frequentPanel, BoxLayout.PAGE_AXIS));
+						String frequentQuery = "select email from customer where reservationID in (select reservationID from reservation where updatedon <= curdate() and updatedon >= date_sub(now(), interval 24 month)) group by email having count(*) >= 4;";
+						Statement frequentStmt = null;
+						ResultSet frequentRs = null;
+						try {
+							frequentStmt = connection.createStatement();
+							frequentRs = frequentStmt.executeQuery(frequentQuery);
+							ResultSetMetaData metaData = frequentRs.getMetaData();
+						    int columnCount = metaData.getColumnCount();
+						    Vector<String> columnNames = new Vector<String>();
+						    columnNames.add("Email");
+							Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+						    while (frequentRs.next()) {
+						        Vector<Object> vector = new Vector<Object>();
+						        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+						            vector.add(frequentRs.getObject(columnIndex));
+						        }
+						        data.add(vector);
+						    }
+						    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+						    	@Override
+						        public boolean isCellEditable(int row, int column) {
+						           return false;
+						        }
+						    };
+						    JTable frequentTable = new JTable(myModel);
+						    JScrollPane frequentScrollPane = new JScrollPane(frequentTable);
+						    frequentTable.setFillsViewportHeight(true);
+						    frequentPanel.add(frequentScrollPane);
+						    frequentFrame.add(frequentPanel);
+						    frequentFrame.pack();
+						    frequentFrame.setLocationRelativeTo(null);
+						    frequentFrame.setVisible(true);
+						    frequentFrame.setResizable(true);
+					} catch (SQLException se) {
+						se.printStackTrace();}
+					}
+				});
+				viewStatsPanel.add(viewSales);
+				viewStatsPanel.add(viewUnsold);
+				viewStatsPanel.add(viewFrequent);
+				viewStatsFrame.add(viewStatsPanel);
+				viewStatsFrame.pack();
+				viewStatsFrame.setLocationRelativeTo(null);
+				viewStatsFrame.setVisible(true);
+				viewStatsFrame.setResizable(true);
+			}
+		});
+		
+		modifySchedule.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFrame modSFrame = new JFrame();
+				JPanel modSPanel = new JPanel();
+				modSPanel.setLayout(new BoxLayout(modSPanel, BoxLayout.PAGE_AXIS));
+				JLabel modSTitle = new JLabel("Choose a flight: ");
+				String modSSchedule = "SELECT Flight.flightID, airlineName, model, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime FROM FLIGHT, SCHEDULE WHERE FLIGHT.flightID = SCHEDULE.flightID ORDER BY departTime;";
+				Statement modSStmt = null;
+				ResultSet modSRs = null;
+				try {
+					modSStmt = connection.createStatement();
+					modSRs = modSStmt.executeQuery(modSSchedule);
+					ResultSetMetaData metaData = modSRs.getMetaData();
+				    int columnCount = metaData.getColumnCount();
+				    Vector<String> columnNames = new Vector<String>();
+				    columnNames.add("ID");
+				    columnNames.add("Airline");
+				    columnNames.add("Airplane Model");
+				    columnNames.add("Departure Airport");
+				    columnNames.add("Arrival Airport");
+				    columnNames.add("Date");
+				    columnNames.add("Departure Time");
+				    columnNames.add("Arrival Time");
+					Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+				    while (modSRs.next()) {
+				        Vector<Object> vector = new Vector<Object>();
+				        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+				            vector.add(modSRs.getObject(columnIndex));
+				        }
+				        data.add(vector);
+				    }
+				    DefaultTableModel myModel = new DefaultTableModel(data, columnNames) {
+				    	@Override
+				        public boolean isCellEditable(int row, int column) {
+				           return false;
+				        }
+				    };
+				    JTable modSTable = new JTable(myModel);
+				    JScrollPane modSScrollPane = new JScrollPane(modSTable);
+				    modSTable.setFillsViewportHeight(true);
+				    JButton modSOK = new JButton("Ok");
+				    modSOK.addActionListener(new ActionListener() {
+				    	public void actionPerformed(ActionEvent a) {
+				    		int selectedRow = modSTable.getSelectedRow();
+				    		int flightID = (int) modSTable.getValueAt(selectedRow, 0);
+				    		String selectedAirline = (String) modSTable.getValueAt(selectedRow, 1);
+				    		String selectedModel = (String) modSTable.getValueAt(selectedRow, 2);
+				    		String selectedDepartAir = (String) modSTable.getValueAt(selectedRow, 3);
+				    		String selectedArrivalAir = (String) modSTable.getValueAt(selectedRow, 4);
+				    		Object selectedDate = modSTable.getValueAt(selectedRow, 5);
+				    		String selectedDate2 = selectedDate.toString();
+				    		String selectedDepartTime = (String) modSTable.getValueAt(selectedRow, 6);
+				    		String selectedArrivalTime = (String) modSTable.getValueAt(selectedRow, 7);
+				    		JFrame modSOKFrame = new JFrame();
+							JPanel modSOKPanel = new JPanel();
+							modSOKPanel.setLayout(new BoxLayout(modSOKPanel, BoxLayout.PAGE_AXIS));
+							JLabel modSOK1 = new JLabel("Airline: ");
+							JLabel modSOK2 = new JLabel("Airplane Model: ");
+							JLabel modSOK3 = new JLabel("Departure Airport: ");
+							JLabel modSOK4 = new JLabel("Arrival Airport: ");
+							JLabel modSOK5 = new JLabel("Date: ");
+							JLabel modSOK6 = new JLabel("Departure Time: ");
+							JLabel modSOK7 = new JLabel("Arrival Time: ");
+							JTextField modSText1 = new JTextField(selectedAirline);
+							JTextField modSText2 = new JTextField(selectedModel);
+							JTextField modSText3 = new JTextField(selectedDepartAir);
+							JTextField modSText4 = new JTextField(selectedArrivalAir);
+							JTextField modSText5 = new JTextField(selectedDate2);
+							JTextField modSText6 = new JTextField(selectedDepartTime);
+							JTextField modSText7 = new JTextField(selectedArrivalTime);
+							JButton modSInnerOK = new JButton("Ok");
+							modSInnerOK.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent ae) {
+									try {
+										Statement batchStmt = connection.createStatement();
+										if (!modSText1.getText().equals(selectedAirline)) {
+											batchStmt.addBatch("update flight set airlineName ='"+modSText1.getText()+"' where flightID = "+flightID);
+										}
+										if (!modSText2.getText().equals(selectedModel)) {
+											batchStmt.addBatch("update flight set model ='"+modSText2.getText()+"' where flightID = "+flightID);
+										}
+										if (!modSText3.getText().equals(selectedDepartAir)) {
+											batchStmt.addBatch("update flight set departairport ='"+modSText3.getText()+"' where flightID = "+flightID);
+										}
+										if (!modSText4.getText().equals(selectedArrivalAir)) {
+											batchStmt.addBatch("update flight set arriveairport ='"+modSText4.getText()+"' where flightID = "+flightID);
+										}
+										if (!modSText5.getText().equals(selectedDate2)) {
+											batchStmt.addBatch("update schedule set date ='"+modSText5.getText()+"' where flightID = "+flightID);
+										}
+										if (!modSText6.getText().equals(selectedDepartTime)) {
+											batchStmt.addBatch("update schedule set departtime ='"+modSText6.getText()+"' where flightID = "+flightID);
+										}
+										if (!modSText7.getText().equals(selectedArrivalTime)) {
+											batchStmt.addBatch("update schedule set arrivetime ='"+modSText7.getText()+"' where flightID = "+flightID);
+										}
+										batchStmt.executeBatch();
+										System.out.println("Updates confirmed.");
+										modSOKFrame.dispose();
+									} catch (SQLException e) {
+										e.printStackTrace();
+									}
+								}
+							});
+							JButton modSInnerCancel = new JButton("Cancel");
+							modSInnerCancel.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent ae) {
+									modSOKFrame.dispose();
+								}
+							});
+							modSOKPanel.add(modSOK1);
+							modSOKPanel.add(modSText1);
+							modSOKPanel.add(modSOK2);
+							modSOKPanel.add(modSText2);
+							modSOKPanel.add(modSOK3);
+							modSOKPanel.add(modSText3);
+							modSOKPanel.add(modSOK4);
+							modSOKPanel.add(modSText4);
+							modSOKPanel.add(modSOK5);
+							modSOKPanel.add(modSText5);
+							modSOKPanel.add(modSOK6);
+							modSOKPanel.add(modSText6);
+							modSOKPanel.add(modSOK7);
+							modSOKPanel.add(modSText7);
+							modSOKPanel.add(modSInnerOK);
+							modSOKPanel.add(modSInnerCancel);
+							modSOKFrame.add(modSOKPanel);
+							modSOKFrame.pack();
+							modSOKFrame.setLocationRelativeTo(null);
+							modSOKFrame.setVisible(true);
+							modSOKFrame.setResizable(true);
+				    	}
+				    });
+				    JButton modSCancel = new JButton("Cancel");
+				    modSCancel.addActionListener(new ActionListener() {
+				    	public void actionPerformed(ActionEvent ae) {
+				    		modSFrame.dispose();
+				    	}
+				    });
+				    modSPanel.add(modSTitle);
+				    modSPanel.add(modSScrollPane);
+				    modSPanel.add(modSOK);
+				    modSPanel.add(modSCancel);
+				    modSFrame.add(modSPanel);
+				    modSFrame.pack();
+					modSFrame.setLocationRelativeTo(null);
+					modSFrame.setVisible(true);
+					modSFrame.setResizable(true);
+				    
+			} catch(SQLException sql) {
+				sql.printStackTrace();}
+			}
+		});
+		
+		addNewItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ea) {
+				JFrame addNewFrame = new JFrame();
+				JPanel addNewPanel = new JPanel();
+				addNewPanel.setLayout(new BoxLayout(addNewPanel, BoxLayout.PAGE_AXIS));
+				JButton addFlight = new JButton("Add Flight");
+				JButton addPlane = new JButton("Add Plane");
+				JButton addAirport = new JButton("Add Airport");
+				addFlight.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						JFrame addFlightFrame = new JFrame();
+						JPanel addFlightPanel = new JPanel();
+						addFlightPanel.setLayout(new BoxLayout(addFlightPanel, BoxLayout.PAGE_AXIS));
+						JLabel addFlightLabel1 = new JLabel("Airline Name");
+						JLabel addFlightLabel2 = new JLabel("Airplane Model");
+						JLabel addFlightLabel3 = new JLabel("Departure Airport");
+						JLabel addFlightLabel4 = new JLabel("Arrival Airport");
+						JLabel addFlightLabel5 = new JLabel("Available Seats");
+						JTextField addFlightField1 = new JTextField(20);
+						JTextField addFlightField2 = new JTextField(20);
+						JTextField addFlightField3 = new JTextField(3);
+						JTextField addFlightField4 = new JTextField(3);
+						JTextField addFlightField5 = new JTextField(20);
+						JButton addFlightOK = new JButton("Ok");
+						addFlightOK.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent aea) {
+								String addFlightInsert = "insert into flight(airlinename, model, departairport, arriveairport, availableseats) values(?,?,?,?,?)";
+								PreparedStatement pre;
+								try {
+									pre = connection.prepareStatement(addFlightInsert);
+									pre.setString(1, addFlightField1.getText());
+									pre.setString(2, addFlightField2.getText());
+									pre.setString(3, addFlightField3.getText());
+									pre.setString(4, addFlightField4.getText());
+									pre.setInt(5, Integer.parseInt(addFlightField5.getText()));
+									pre.executeUpdate();									
+									System.out.println("Confirmed new flight.");
+									addFlightFrame.dispose();
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							}
+						});
+						JButton addFlightCancel = new JButton("Cancel");
+						addFlightCancel.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent aea) {
+								addFlightFrame.dispose();
+							}
+						});
+						addFlightPanel.add(addFlightLabel1);
+						addFlightPanel.add(addFlightField1);
+						addFlightPanel.add(addFlightLabel2);
+						addFlightPanel.add(addFlightField2);
+						addFlightPanel.add(addFlightLabel3);
+						addFlightPanel.add(addFlightField3);
+						addFlightPanel.add(addFlightLabel4);
+						addFlightPanel.add(addFlightField4);
+						addFlightPanel.add(addFlightLabel5);
+						addFlightPanel.add(addFlightField5);
+						addFlightPanel.add(addFlightOK);
+						addFlightPanel.add(addFlightCancel);
+						addFlightFrame.add(addFlightPanel);
+						addFlightFrame.pack();
+						addFlightFrame.setLocationRelativeTo(null);
+						addFlightFrame.setVisible(true);
+						addFlightFrame.setResizable(true);
+					}
+				});
+				addPlane.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						JFrame addPlaneFrame = new JFrame();
+						JPanel addPlanePanel = new JPanel();
+						addPlanePanel.setLayout(new BoxLayout(addPlanePanel, BoxLayout.PAGE_AXIS));
+						JLabel addPlaneLabel1 = new JLabel("Airplane Model");
+						JLabel addPlaneLabel2 = new JLabel("Seat Capacity");
+						JTextField addPlaneField1 = new JTextField(20);
+						JTextField addPlaneField2 = new JTextField(20);
+						JButton addPlaneOK = new JButton("Ok");
+						addPlaneOK.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent aea) {
+								String addPlaneInsert = "insert into plane values(?,?)";
+								PreparedStatement pre;
+								try {
+									pre = connection.prepareStatement(addPlaneInsert);
+									pre.setString(1, addPlaneField1.getText());
+									pre.setInt(2, Integer.parseInt(addPlaneField2.getText()));
+									pre.executeUpdate();									
+									System.out.println("Confirmed new plane.");
+									addPlaneFrame.dispose();
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							}
+						});
+						JButton addPlaneCancel = new JButton("Cancel");
+						addPlaneCancel.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent aea) {
+								addPlaneFrame.dispose();
+							}
+						});
+						addPlanePanel.add(addPlaneLabel1);
+						addPlanePanel.add(addPlaneField1);
+						addPlanePanel.add(addPlaneLabel2);
+						addPlanePanel.add(addPlaneField2);
+						addPlanePanel.add(addPlaneOK);
+						addPlanePanel.add(addPlaneCancel);
+						addPlaneFrame.add(addPlanePanel);
+						addPlaneFrame.pack();
+						addPlaneFrame.setLocationRelativeTo(null);
+						addPlaneFrame.setVisible(true);
+						addPlaneFrame.setResizable(true);
+					}
+				});
+				addAirport.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						JFrame addAirportFrame = new JFrame();
+						JPanel addAirportPanel = new JPanel();
+						addAirportPanel.setLayout(new BoxLayout(addAirportPanel, BoxLayout.PAGE_AXIS));
+						JLabel addAirportLabel1 = new JLabel("Airport Code");
+						JLabel addAirportLabel2 = new JLabel("Airport Name");
+						JLabel addAirportLabel3 = new JLabel("City");
+						JLabel addAirportLabel4 = new JLabel("State");
+						JTextField addAirportField1 = new JTextField(3);
+						JTextField addAirportField2 = new JTextField(50);
+						JTextField addAirportField3 = new JTextField(20);
+						JTextField addAirportField4 = new JTextField(20);
+						JButton addAirportOK = new JButton("Ok");
+						addAirportOK.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent aea) {
+								String addAirportInsert = "insert into airport values(?,?,?,?)";
+								PreparedStatement pre;
+								try {
+									pre = connection.prepareStatement(addAirportInsert);
+									pre.setString(1, addAirportField1.getText());
+									pre.setString(2, addAirportField2.getText());
+									pre.setString(3, addAirportField3.getText());
+									pre.setString(4, addAirportField4.getText());
+									pre.executeUpdate();									
+									System.out.println("Confirmed new airport.");
+									addAirportFrame.dispose();
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							}
+						});
+						JButton addAirportCancel = new JButton("Cancel");
+						addAirportCancel.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent aea) {
+								addAirportFrame.dispose();
+							}
+						});
+						addAirportPanel.add(addAirportLabel1);
+						addAirportPanel.add(addAirportField1);
+						addAirportPanel.add(addAirportLabel2);
+						addAirportPanel.add(addAirportField2);
+						addAirportPanel.add(addAirportLabel3);
+						addAirportPanel.add(addAirportField3);
+						addAirportPanel.add(addAirportLabel4);
+						addAirportPanel.add(addAirportField4);
+						addAirportPanel.add(addAirportOK);
+						addAirportPanel.add(addAirportCancel);
+						addAirportFrame.add(addAirportPanel);
+						addAirportFrame.pack();
+						addAirportFrame.setLocationRelativeTo(null);
+						addAirportFrame.setVisible(true);
+						addAirportFrame.setResizable(true);
+					}
+				});
+				addNewPanel.add(addFlight);
+				addNewPanel.add(addPlane);
+				addNewPanel.add(addAirport);
+				addNewFrame.add(addNewPanel);
+				addNewFrame.pack();
+				addNewFrame.setLocationRelativeTo(null);
+				addNewFrame.setVisible(true);
+				addNewFrame.setResizable(true);
 			}
 		});
 		
