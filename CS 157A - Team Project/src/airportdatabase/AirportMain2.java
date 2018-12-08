@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,7 +20,7 @@ public class AirportMain {
 
 	//  Database credentials
 	static final String USER = "root";
-	static final String PASS = "laishingling"; //replace with your password
+	static final String PASS = "12345678"; //replace with your password
 	
 	static String EMAIL = "";
 	static String USERPASS = "";
@@ -59,12 +60,14 @@ public class AirportMain {
 			label2.setFont(new Font("Serif", Font.BOLD, 22));
 			JTextField text1 = new JTextField(10);
 			text1.setFont(new Font("Helvetica", Font.BOLD, 22));
-			JTextField text2 = new JTextField(10);
-			text2.setFont(new Font("Helvetica", Font.BOLD, 22));
+			//JTextField text2 = new JTextField(10);
+			//text2.setFont(new Font("Helvetica", Font.BOLD, 22));
+			JPasswordField password = new JPasswordField(20);
+			password.setEchoChar('*');
 			panel.add(label1);
 			panel.add(text1);
 			panel.add(label2);
-			panel.add(text2);
+			panel.add(password);
 			JButton ok = new JButton("Ok");
 			JButton button4 = new JButton("Cancel");
 			JLabel flag = new JLabel("Incorrect email/password. Try again");
@@ -82,7 +85,8 @@ public class AirportMain {
 				public void actionPerformed(ActionEvent arg0) {
 					ResultSet rs2 = null; 
 				    EMAIL = text1.getText();
-					USERPASS = text2.getText();
+		            USERPASS += new String(password.getPassword()); 
+		            System.out.println(USERPASS);
 					String userType;
 					String check = "SELECT * FROM USER WHERE email = ? AND password = ?;";
 							
@@ -522,8 +526,10 @@ public class AirportMain {
 			public void actionPerformed(ActionEvent arg0) {
 				JFrame viewFrame = new JFrame();
 				JPanel viewPanel = new JPanel();
-				viewPanel.setLayout(new BoxLayout(viewPanel, BoxLayout.PAGE_AXIS));
+				viewPanel.setLayout(new BorderLayout());
 				JLabel viewTitle = new JLabel("Schedule");
+				viewTitle.setHorizontalAlignment(SwingConstants.CENTER);
+				viewTitle.setFont(new Font("Serif", Font.BOLD, 27));
 				String listSchedule = "SELECT Flight.flightID, airlineName, model, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime FROM FLIGHT, SCHEDULE WHERE FLIGHT.flightID = SCHEDULE.flightID ORDER BY departTime;";
 				Statement stmt = null;
 				ResultSet rs = null;
@@ -558,10 +564,10 @@ public class AirportMain {
 				    JTable viewTable = new JTable(myModel);
 				    JScrollPane viewScrollPane = new JScrollPane(viewTable);
 				    viewTable.setFillsViewportHeight(true);
-				    viewPanel.add(viewTitle);
-				    viewPanel.add(viewScrollPane);
+				    viewPanel.add(viewTitle, BorderLayout.NORTH);
+				    viewPanel.add(viewScrollPane, BorderLayout.CENTER);
 				    viewFrame.add(viewPanel);
-				    viewFrame.pack();
+				    viewFrame.setSize(1000,350);
 					viewFrame.setLocationRelativeTo(null);
 					viewFrame.setVisible(true);
 					viewFrame.setResizable(true);
