@@ -968,7 +968,9 @@ public class AirportMain {
 							JTextField modSText4 = new JTextField(selectedArrivalAir);
 							JTextField modSText5 = new JTextField(selectedDate2);
 							JTextField modSText6 = new JTextField(selectedDepartTime);
+							modSText6.setText(modSText6.getText().substring(0, 5)+":00");
 							JTextField modSText7 = new JTextField(selectedArrivalTime);
+							modSText7.setText(modSText7.getText().substring(0, 5)+":00");
 							JButton modSInnerOK = new JButton("Ok");
 							modSInnerOK.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent ae) {
@@ -993,7 +995,7 @@ public class AirportMain {
 											batchStmt.addBatch("update schedule set departtime ='"+modSText6.getText()+"' where flightID = "+flightID);
 										}
 										if (!modSText7.getText().equals(selectedArrivalTime)) {
-											batchStmt.addBatch("update schedule set arrivetime ='"+modSText7.getText()+"' where flightID = "+flightID);
+											batchStmt.addBatch("update schedule set arrivaltime ='"+modSText7.getText()+"' where flightID = "+flightID);
 										}
 										batchStmt.executeBatch();
 										System.out.println("Updates confirmed.");
