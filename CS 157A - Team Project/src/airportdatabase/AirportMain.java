@@ -22,7 +22,7 @@ public class AirportMain {
 
 	//  Database credentials
 	static final String USER = "root";
-	static final String PASS = "Sh@d0wmage5"; //replace with your password
+	static final String PASS = "12345678"; //replace with your password
 	
 	static String EMAIL = "";
 	static String USERPASS = "";
@@ -62,8 +62,6 @@ public class AirportMain {
 			label2.setFont(new Font("Serif", Font.BOLD, 22));
 			JTextField text1 = new JTextField(10);
 			text1.setFont(new Font("Helvetica", Font.BOLD, 22));
-			//JTextField text2 = new JTextField(10);
-			//text2.setFont(new Font("Helvetica", Font.BOLD, 22));
 			JPasswordField password = new JPasswordField(20);
 			password.setEchoChar('*');
 			panel.add(label1);
@@ -88,7 +86,6 @@ public class AirportMain {
 					ResultSet rs2 = null; 
 				    EMAIL = text1.getText();
 		            USERPASS += new String(password.getPassword()); 
-		            System.out.println(USERPASS);
 					String userType;
 					String check = "SELECT * FROM USER WHERE email = ? AND password = ?;";
 							
@@ -151,8 +148,8 @@ public class AirportMain {
 			panel.add(emailText);
 			JLabel passwordLabel = new JLabel("Password:");
 			passwordLabel.setFont(new Font("Serif", Font.BOLD, 22));
-			JTextField passwordText = new JTextField(10);
-			passwordText.setFont(new Font("Helvetica", Font.BOLD, 22));
+			JPasswordField passwordText = new JPasswordField(20);
+			passwordText.setEchoChar('*');
 			panel.add(passwordLabel);
 			panel.add(passwordText);
 			JRadioButton button1 = new JRadioButton("User");
@@ -182,7 +179,7 @@ public class AirportMain {
 					String insert = "INSERT INTO USER VALUES(?, ?, ?);";
 					String name = nameText.getText();
 					String email = emailText.getText();
-					String password = passwordText.getText();
+					String password = new String(passwordText.getPassword());
 					String userType;
 					
 					if(button1.isSelected())
@@ -616,7 +613,7 @@ public class AirportMain {
 				viewPanel.setLayout(new BorderLayout());
 				JLabel viewTitle = new JLabel("Schedule");
 				viewTitle.setHorizontalAlignment(SwingConstants.CENTER);
-				viewTitle.setFont(new Font("Serif", Font.BOLD, 27));
+				viewTitle.setFont(new Font("Serif", Font.BOLD, 36));
 				String listSchedule = "SELECT Flight.flightID, airlineName, model, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime FROM FLIGHT, SCHEDULE WHERE FLIGHT.flightID = SCHEDULE.flightID ORDER BY departTime;";
 				Statement stmt = null;
 				ResultSet rs = null;
@@ -654,7 +651,7 @@ public class AirportMain {
 				    viewPanel.add(viewTitle, BorderLayout.NORTH);
 				    viewPanel.add(viewScrollPane, BorderLayout.CENTER);
 				    viewFrame.add(viewPanel);
-				    viewFrame.setSize(1000,350);
+				    viewFrame.setSize(1000,200);
 					viewFrame.setLocationRelativeTo(null);
 					viewFrame.setVisible(true);
 					viewFrame.setResizable(true);
@@ -669,8 +666,11 @@ public class AirportMain {
 			public void actionPerformed(ActionEvent e) {
 				JFrame viewResFrame = new JFrame();
 				JPanel viewResPanel = new JPanel();
-				viewResPanel.setLayout(new BoxLayout(viewResPanel, BoxLayout.PAGE_AXIS));
+				viewResPanel.setLayout(new BorderLayout());
 				JLabel nameLabel = new JLabel("Reservations");
+				nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				nameLabel.setFont(new Font("Serif", Font.BOLD, 36));
+				
 				String viewQuery = "select Reservation.reservationID, name, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule, customer where customer.reservationID = reservation.reservationID and reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID and Reservation.reservationID in (select reservationID from customer where email = '"+EMAIL+"') order by date;";
 				if(userType.equals("admin"))
 					viewQuery = "select Reservation.reservationID, name, airlineName, class, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime, type, price from flight, reservation, schedule, customer where customer.reservationID = reservation.reservationID and reservation.flightID = flight.flightID and reservation.flightID = schedule.flightID order by date;";
@@ -710,10 +710,10 @@ public class AirportMain {
 				    JTable viewResTable = new JTable(myModel);
 				    JScrollPane viewResScrollPane = new JScrollPane(viewResTable);
 				    viewResTable.setFillsViewportHeight(true);
-				    viewResPanel.add(nameLabel);
-				    viewResPanel.add(viewResScrollPane);
+				    viewResPanel.add(nameLabel,BorderLayout.NORTH);
+				    viewResPanel.add(viewResScrollPane,BorderLayout.CENTER);
 				    viewResFrame.add(viewResPanel);
-				    viewResFrame.pack();
+				    viewResFrame.setSize(1000,150);
 					viewResFrame.setLocationRelativeTo(null);
 					viewResFrame.setVisible(true);
 					viewResFrame.setResizable(true);
@@ -730,7 +730,7 @@ public class AirportMain {
 				modPanel.setLayout(new BoxLayout(modPanel, BoxLayout.PAGE_AXIS));
 				JLabel emailLabel = new JLabel("Email: "+EMAIL);
 				JButton changeEmail = new JButton("Change");
-				JLabel passLabel = new JLabel("Password: "+USERPASS);
+				JLabel passLabel = new JLabel("Password: ");
 				JButton changePass = new JButton("Change");
 				changeEmail.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -740,13 +740,15 @@ public class AirportMain {
 						JLabel newEmail = new JLabel("New Email: ");
 						JTextField newEmailField = new JTextField(EMAIL);
 						JLabel passConfirm = new JLabel("Password");
-						JTextField passConfirmField = new JTextField(20);
+						JPasswordField passConfirmField = new JPasswordField(20);
+						passConfirmField.setEchoChar('*');
 						JButton emailOK = new JButton("Ok");
 						JButton emailCancel = new JButton("Cancel");
 						
 						emailOK.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								if (passConfirmField.getText().equals(USERPASS)) {
+					            String passwordConfirm =  new String(passConfirmField.getPassword()); 
+								if (passwordConfirm.equals(USERPASS)) {
 								String emailQuery = "update user set email = ? where email = ?";
 								PreparedStatement pre;
 								try {
@@ -788,24 +790,31 @@ public class AirportMain {
 						JPanel passPanel = new JPanel();
 						passPanel.setLayout(new BoxLayout(passPanel, BoxLayout.PAGE_AXIS));
 						JLabel newPass = new JLabel("New Password: ");
-						JTextField newPassField = new JTextField(20);
+						JPasswordField newPassField = new JPasswordField(20);
+						newPassField.setEchoChar('*');
+						//JTextField newPassField = new JTextField(20);
 						JLabel oldPass = new JLabel("Old Password: ");
-						JTextField oldPassField = new JTextField(20);
+						//JTextField oldPassField = new JTextField(20);
+						JPasswordField oldPassField = new JPasswordField(20);
+						oldPassField.setEchoChar('*');
 						JButton passOK = new JButton("Ok");
 						JButton passCancel = new JButton("Cancel");
 						
 						passOK.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								if (oldPassField.getText().equals(USERPASS)) {
+					            String oldPass =  new String(oldPassField.getPassword()); 
+					            String newPass =  new String(newPassField.getPassword()); 
+
+								if (oldPass.equals(USERPASS)) {
 								String passQuery = "update user set password = ? where password = ?";
 								PreparedStatement pre;
 								try {
 									pre = connection.prepareStatement(passQuery);
-									pre.setString(1, newPassField.getText());
+									pre.setString(1, newPass);
 									pre.setString(2, USERPASS);
 									pre.executeUpdate();								
 									System.out.println("Confirmed update of password.");
-									USERPASS = newPassField.getText();
+									USERPASS = newPass;
 									passFrame.dispose();
 									modFrame.dispose();
 								} catch (SQLException ex) {
@@ -996,8 +1005,11 @@ public class AirportMain {
 			public void actionPerformed(ActionEvent e) {
 				JFrame modSFrame = new JFrame();
 				JPanel modSPanel = new JPanel();
-				modSPanel.setLayout(new BoxLayout(modSPanel, BoxLayout.PAGE_AXIS));
+				
+				modSPanel.setLayout(new BorderLayout());
 				JLabel modSTitle = new JLabel("Choose a flight: ");
+				modSTitle.setHorizontalAlignment(SwingConstants.CENTER);
+				modSTitle.setFont(new Font("Serif", Font.BOLD, 36));
 				String modSSchedule = "SELECT Flight.flightID, airlineName, model, departAirport, arriveAirport, date, TIME_FORMAT(departTime, '%h:%i %p') departTime, TIME_FORMAT(arrivalTime, '%h:%i %p') arrivalTime FROM FLIGHT, SCHEDULE WHERE FLIGHT.flightID = SCHEDULE.flightID ORDER BY departTime;";
 				Statement modSStmt = null;
 				ResultSet modSRs = null;
@@ -1121,7 +1133,7 @@ public class AirportMain {
 							modSOKPanel.add(modSInnerOK);
 							modSOKPanel.add(modSInnerCancel);
 							modSOKFrame.add(modSOKPanel);
-							modSOKFrame.pack();
+							modSOKFrame.pack();;
 							modSOKFrame.setLocationRelativeTo(null);
 							modSOKFrame.setVisible(true);
 							modSOKFrame.setResizable(true);
@@ -1133,12 +1145,15 @@ public class AirportMain {
 				    		modSFrame.dispose();
 				    	}
 				    });
-				    modSPanel.add(modSTitle);
-				    modSPanel.add(modSScrollPane);
-				    modSPanel.add(modSOK);
-				    modSPanel.add(modSCancel);
+				    JPanel subPanel = new JPanel();
+				    subPanel.add(modSOK);
+				    subPanel.add(modSCancel);
+
+				    modSPanel.add(modSTitle,BorderLayout.NORTH);
+				    modSPanel.add(modSScrollPane, BorderLayout.CENTER);
+				    modSPanel.add(subPanel, BorderLayout.SOUTH);
 				    modSFrame.add(modSPanel);
-				    modSFrame.pack();
+				    modSFrame.setSize(1000,280);
 					modSFrame.setLocationRelativeTo(null);
 					modSFrame.setVisible(true);
 					modSFrame.setResizable(true);
