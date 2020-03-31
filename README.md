@@ -1,6 +1,6 @@
 ## SCKFlight
 
-A three-persons team project for `CS157A - Database Management Systems` in _San Jose State University_. This project is a window-based, GUI
+A three-persons team project for `CS157A - Database Management Systems` at _San Jose State University_. This project is a window-based, GUI
 application that allows users to create and manage airlines reservations and information.
 
 <h1 align="center">
